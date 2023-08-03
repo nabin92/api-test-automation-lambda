@@ -5,10 +5,13 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+
 import java.util.function.Consumer;
 import java.util.function.Function;
+
 import org.ado.fixture.CreateProjectFixture;
 import org.testng.annotations.Test;
+
 import static io.restassured.RestAssured.given;
 import static org.apache.http.HttpStatus.SC_ACCEPTED;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -22,16 +25,16 @@ public class ProjectTest {
 
     @Test
     public void shouldGetProject() {
-        Response response = getResponse(request -> request.get("{organization}/_apis/projects/"));
-        validateResponse(validatableResponse -> validatableResponse.body("$", hasKey("count")), response, SC_OK);
+        Response response = getResponse(r -> r.get("{organization}/_apis/projects/"));
+        validateResponse(v -> v.body("$", hasKey("count")), response, SC_OK);
     }
 
     @Test
     public void shouldCreateProject() {
-        Response processResponse = getResponse(request -> request.get("{organization}/_apis/process/processes"));
+        Response processResponse = getResponse(r -> r.get("{organization}/_apis/process/processes"));
         String templateId = processResponse.jsonPath().getString("value[0].id");
-        Response createProject = getResponse(request -> request.body(createProjectFixture.getProjectRequest(templateId)).post("{organization}/_apis/projects"));
-        validateResponse(validatableResponse -> validatableResponse.body("$", hasKey("id")), createProject, SC_ACCEPTED);
+        Response createProject = getResponse(r -> r.body(createProjectFixture.getProjectRequest(templateId)).post("{organization}/_apis/projects"));
+        validateResponse(v -> v.body("$", hasKey("id")), createProject, SC_ACCEPTED);
     }
 
     public Response getResponse(Function<RequestSpecification, Response> function) {
